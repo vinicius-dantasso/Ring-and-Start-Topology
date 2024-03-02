@@ -3,8 +3,6 @@ package Estrela.client;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 import Estrela.handler.*;
 
@@ -17,7 +15,6 @@ public class ClientServer {
     int port;
     int nextPort;
     public static String id;
-    public static List<Socket> connections = new ArrayList<>();
 
     public ClientServer(String i, String id, int p, int p2) {
         this.ip = i;

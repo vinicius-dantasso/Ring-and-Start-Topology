@@ -27,7 +27,6 @@ public class ServerHandler implements Runnable {
     public void run() {
         
         String received;
-        //System.out.println("Conexão com o cliente: " + client.getLocalAddress());
 
         try {
 
