@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import Estrela.handler.*;
 
@@ -34,10 +33,6 @@ public class ClientServer {
 
             server = new ServerSocket(port);
             System.out.println("Servidor iniciado na porta: " + server.getLocalPort());
-
-            @SuppressWarnings("resource")
-            Scanner sc = new Scanner(System.in);
-            sc.nextLine();
 
             client = new Socket(ip,nextPort);
             ClientHandler ch = new ClientHandler(client);
