@@ -64,7 +64,7 @@ public class ClientServer {
 
     public static void main(String[] args) {
         new ClientServer("127.0.0.1","P1", 5001, 5002);
-        //new ClientServer("127.0.0.2","P2", 5002, 5001);
+        //new ClientServer("127.0.0.2","P2", 5002, 5003);
         //new ClientServer("127.0.0.3","P3", 5003, 5004);
         //new ClientServer("127.0.0.4","P4", 5004, 5001);
     }

@@ -2,7 +2,6 @@ package Anel.handlers;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import Anel.client.ClientServer;
@@ -15,7 +14,6 @@ public class ServerHandler implements Runnable {
     boolean connection = true;
     // Recebimento de Objetos
     ObjectInputStream input;
-    ObjectOutputStream output;
 
     public ServerHandler(Socket c, ClientHandler ch) {
         this.client = c;
@@ -31,11 +29,11 @@ public class ServerHandler implements Runnable {
 
         try {
 
+            input = new ObjectInputStream(client.getInputStream());
+
             while(connection) {
 
                 // Mensagem recebida do cliente
-                output = new ObjectOutputStream(client.getOutputStream());
-                input = new ObjectInputStream(client.getInputStream());
                 @SuppressWarnings({ "unchecked", "rawtypes" })
                 Package<String> pack = (Package) input.readObject();
                 receivedMsg = pack.getMessage();
@@ -71,7 +69,6 @@ public class ServerHandler implements Runnable {
 
             }
 
-            output.close();
             input.close();
             client.close();
 

@@ -1,7 +1,6 @@
 package Anel.handlers;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
@@ -15,7 +14,6 @@ public class ClientHandler implements Runnable{
     private boolean connection = true;
     private Package<String> pack;
     // Envio de Mensagens
-    public ObjectInputStream input;
     public ObjectOutputStream output;
 
     public ClientHandler(Socket c) {
@@ -30,8 +28,10 @@ public class ClientHandler implements Runnable{
             System.out.println("O cliente conectou ao servidor");
 
             Scanner sc = new Scanner(System.in);
+            output = new ObjectOutputStream(client.getOutputStream());
 
             String msg;
+            boolean noProblems = true;
 
             while(connection) {
 
@@ -40,9 +40,6 @@ public class ClientHandler implements Runnable{
                 System.out.println("Ao final de cada mensagem digite /{?cast}/{P?}");
                 System.out.println("=====================================");
 
-                output = new ObjectOutputStream(client.getOutputStream());
-                input = new ObjectInputStream(client.getInputStream());
-
                 msg = sc.nextLine();
                 msg = msg.concat("/" + ClientServer.id);
 
@@ -50,16 +47,31 @@ public class ClientHandler implements Runnable{
                     connection = false;
                 }
                 else {
+
+                    while(!msg.contains("unicast") && noProblems) {
+
+                        if(msg.contains("broadcast")) {
+                            noProblems = false;
+                        }
+                        else {
+                            System.out.println("Comando incorreto! Por favor escreva novamente.");
+                            msg = sc.nextLine();
+                            msg = msg.concat("/" + ClientServer.id);
+                        }
+                        
+                    }
+
                     pack = new Package<String>(msg);
                     output.writeObject(pack);
                     output.flush();
                     System.out.println("Mensagem enviada!");
+                    noProblems = true;
+
                 }
 
             }
 
             sc.close();
-            input.close();
             output.close();
             client.close();
             System.out.println("Conexão finalizada...");
