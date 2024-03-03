@@ -14,9 +14,9 @@ public class ClientServer {
     String ip;
     int port;
     int nextPort;
-    public static String id;
+    public static int id;
 
-    public ClientServer(String i, String id, int p, int p2) {
+    public ClientServer(String i, int id, int p, int p2) {
         this.ip = i;
         this.port = p;
         this.nextPort = p2;
@@ -51,10 +51,10 @@ public class ClientServer {
     }
 
     public static void main(String[] args) {
-        new ClientServer("127.0.0.1","P1",5001,5001);
-        //new ClientServer("127.0.0.2","P2",5002,5001);
-        //new ClientServer("127.0.0.3","P3",5003,5001);
-        //new ClientServer("127.0.0.4","P4",5004,5001);
+        new ClientServer("127.0.0.1",1,5001,5001);
+        //new ClientServer("127.0.0.2",2,5002,5001);
+        //new ClientServer("127.0.0.3",3,5003,5001);
+        //new ClientServer("127.0.0.4",4,5004,5001);
     }
 
 }

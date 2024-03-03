@@ -29,6 +29,7 @@ public class ClientHandler implements Runnable {
             printer = new PrintStream(client.getOutputStream());
 
             String msg;
+            boolean noProblems = true;
 
             while(connection) {
                 
@@ -44,10 +45,25 @@ public class ClientHandler implements Runnable {
                     connection = false;
                 }
                 else {
-                    System.out.println("Mensagem enviada!");
-                }
 
-                printer.println(msg);
+                    while(!msg.contains("unicast") && noProblems) {
+
+                        if(msg.contains("broadcast")) {
+                            noProblems = false;
+                        }
+                        else {
+                            System.out.println("Comando incorreto! Por favor escreva novamente.");
+                            msg = sc.nextLine();
+                            msg = msg.concat("/" + ClientServer.id);
+                        }
+                        
+                    }
+
+                    System.out.println("Mensagem enviada...");
+                    printer.println(msg);
+                    noProblems = true;
+
+                }
 
             }
 

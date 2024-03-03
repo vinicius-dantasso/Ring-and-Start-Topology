@@ -14,7 +14,6 @@ public class ServerHandler implements Runnable {
     private Socket client;
     private boolean connection = true;
     private Scanner sc = null;
-    private static int cont = -1;
     public static List<Socket> connections = new ArrayList<>();
 
     public ServerHandler(Socket c) {
@@ -22,7 +21,6 @@ public class ServerHandler implements Runnable {
         connections.add(c);
     }
 
-    @SuppressWarnings("resource")
     @Override
     public void run() {
         
@@ -32,7 +30,8 @@ public class ServerHandler implements Runnable {
 
             sc = new Scanner(client.getInputStream());
             String splitMsg[];
-            String clientId, castType, finalMsg;
+            String castType, finalMsg;
+            int clientId;
             Socket sender = null;
             PrintStream printer = null;
 
@@ -40,167 +39,42 @@ public class ServerHandler implements Runnable {
                 
                 received = sc.nextLine();
                 splitMsg = received.split("/");
-                clientId = splitMsg[2];
+                clientId = Integer.parseInt(splitMsg[2]);
                 castType = splitMsg[1];
                 finalMsg = splitMsg[0];
 
-                if(cont == 2) {
-                    castType = "cast";
-                    cont = -1;
-                }
-
-                if(clientId.equals(ClientServer.id) && castType.equals("unicast")) {
+                if(clientId == ClientServer.id && castType.equals("unicast")) {
                     System.out.println("Mensagem recebida de " + splitMsg[3] + ": " + finalMsg);
                 }
-                else if(!clientId.equals("anything") && castType.equals("unicast")) {
+                else if(clientId != 999 && castType.equals("unicast")) {
 
                     System.out.println("Encaminhando Mensagem de "+splitMsg[3]+" para "+clientId+"...");
 
-                    switch(clientId) {
-
-                        case "P2":
-                            for(Socket cli : connections) {
-                                String address = cli.getLocalAddress().toString();
-                                if(address.equals("/127.0.0.2")) {
-                                    
-                                    sender = new Socket("127.0.0.2", 5002);
-                                    printer = new PrintStream(sender.getOutputStream());
-                                    printer.println(received);
-
-                                }
-                            }
-                        break;
-
-                        case "P3":
-                            for(Socket cli : connections) {
-                                String address = cli.getLocalAddress().toString();
-                                if(address.equals("/127.0.0.3")) {
-                                    
-                                    sender = new Socket("127.0.0.3", 5003);
-                                    printer = new PrintStream(sender.getOutputStream());
-                                    printer.println(received);
-
-                                }
-                            }
-                        break;
-
-                        case "P4":
-                            for(Socket cli : connections) {
-                                String address = cli.getLocalAddress().toString();
-                                if(address.equals("/127.0.0.4")) {
-                                    
-                                    sender = new Socket("127.0.0.4", 5004);
-                                    printer = new PrintStream(sender.getOutputStream());
-                                    printer.println(received);
-
-                                }
-                            }
-                        break;
-
-                        default:
-                        break;
-
-                    }
+                    sender = new Socket("localhost", 5000 + clientId);
+                    printer = new PrintStream(sender.getOutputStream());
+                    printer.println(received);
 
                 }
 
-                if(castType.equals("broadcast") && !ClientServer.id.equals(clientId)) {
-                    
-                    switch(ClientServer.id) {
+                if(castType.equals("broadcast")) {
 
-                        case "P1":
+                    if(ClientServer.id != 1) {
+                        System.out.println("Mensagem Broadcast de P"+splitMsg[splitMsg.length - 1]+": "+finalMsg);
+                    }
+                    else{
 
-                        switch(clientId) {
+                        for(int i=1;i<=connections.size();i++) {
 
-                            case "P2":
-
-                            if(cont == -1){
+                            if(ClientServer.id == 1 && i == 1 && clientId != 1){
                                 System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                                cont++;
                             }
-
-                            if(cont == 0) {
-                                sender = new Socket("127.0.0.1",5003);
+                            else if(i != clientId) {
+                                sender = new Socket("localhost", 5000 + i);
                                 printer = new PrintStream(sender.getOutputStream());
                                 printer.println(received);
-                                cont++;
                             }
-                            else if(cont == 1) {
-                                sender = new Socket("127.0.0.1",5004);
-                                printer = new PrintStream(sender.getOutputStream());
-                                printer.println(received);
-                                cont++;
-                            }
-
-                            break;
-
-                            case "P3":
-
-                            if(cont == -1){
-                                System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                                cont++;
-                            }
-
-                            if(cont == 0) {
-                                sender = new Socket("127.0.0.1",5002);
-                                printer = new PrintStream(sender.getOutputStream());
-                                printer.println(received);
-                                cont++;
-                            }
-                            else if(cont == 1) {
-                                sender = new Socket("127.0.0.1",5004);
-                                printer = new PrintStream(sender.getOutputStream());
-                                printer.println(received);
-                                cont++;
-                            }
-
-                            break;
-
-                            case "P4":
-
-                            if(cont == -1){
-                                System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                                cont++;
-                            }
-
-                            if(cont == 0) {
-                                sender = new Socket("127.0.0.1",5002);
-                                printer = new PrintStream(sender.getOutputStream());
-                                printer.println(received);
-                                cont++;
-                            }
-                            else if(cont == 1) {
-                                sender = new Socket("127.0.0.1",5003);
-                                printer = new PrintStream(sender.getOutputStream());
-                                printer.println(received);
-                                cont++;
-                            }
-
-                            break;
-
+    
                         }
-
-                        break;
-
-                        case "P2":
-                        System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                        ClientHandler.printer = new PrintStream(ClientHandler.client.getOutputStream());
-                        ClientHandler.printer.println(received);
-                        break;
-
-                        case "P3":
-                        System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                        ClientHandler.printer = new PrintStream(ClientHandler.client.getOutputStream());
-                        ClientHandler.printer.println(received);
-                        break;
-
-                        case "P4":
-                        System.out.println("Mensagem Broadcast de "+splitMsg[splitMsg.length - 1]+": "+finalMsg);
-                        ClientHandler.printer = new PrintStream(ClientHandler.client.getOutputStream());
-                        ClientHandler.printer.println(received);
-                        break;
-
-                        default: break;
 
                     }
 
